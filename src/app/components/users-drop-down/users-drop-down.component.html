@@ -1,0 +1,18 @@
+<div class="dropdown">
+  <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown"
+    aria-expanded="false">
+    {{currentUser.name}}
+  </button>
+  <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+    <li *ngFor="let user of users">
+      <a class="dropdown-item" (click)="onSelectUser(user)" id={{user.id}}>{{user.name}}</a>
+    </li>
+  </ul>
+</div>
+<br>
+<div class="mb-3" *ngIf="showAmountText">
+  <label for="amount" class="form-label">Amount</label>
+  <input type="number" class="form-control" [(ngModel)]="amount" required name="useramount" autocomplete="off" (blur)="onBlurAmount()"
+    #useramount="ngModel">
+  <small *ngIf="useramount.errors?.required && useramount.touched" class="text-danger">required</small>
+</div>

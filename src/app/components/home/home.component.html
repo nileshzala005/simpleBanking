@@ -1,0 +1,111 @@
+<div class="container">
+  <h1 class="text-center">Online Banking System</h1>
+  <nav class="mb-4">
+    <div class="nav nav-tabs" id="nav-tab" role="tablist">
+      <a class="nav-link active" id="nav-balance-tab" data-bs-toggle="tab" (click)="reset()" href="#nav-balance"
+        role="tab" aria-controls="nav-balance" aria-selected="true">Balance</a>
+      <a class="nav-link" id="nav-deposit-tab" data-bs-toggle="tab" (click)="reset()" href="#nav-deposit" role="tab"
+        aria-controls="nav-deposit" aria-selected="false">Deposit</a>
+      <a class="nav-link" id="nav-withdraw-tab" data-bs-toggle="tab" (click)="reset()" href="#nav-withdraw" role="tab"
+        aria-controls="nav-withdraw" aria-selected="false">Withdraw</a>
+      <a class="nav-link" id="nav-transfer-tab" data-bs-toggle="tab" (click)="reset()" href="#nav-transfer" role="tab"
+        aria-controls="nav-transfer" aria-selected="false">Transfer</a>
+      <a class="nav-link" id="nav-statement-tab" data-bs-toggle="tab" (click)="reset()" href="#nav-statement" role="tab"
+        aria-controls="nav-statement" aria-selected="false">Statement</a>
+    </div>
+  </nav>
+  <div class="tab-content" id="nav-tabContent">
+    <div class="tab-pane fade show" [ngClass]="{'active': this.selectedTab === tabType.balance}" id="nav-balance"
+      role="tabpanel" aria-labelledby="nav-balance-tab">
+      <app-users-drop-down (selectedUser)="onChangeUser($event)" [showAmountText]="false" [reset]="resetDD">
+      </app-users-drop-down>
+      <button type="button" class="btn btn-success mt-3 mb-3" (click)="checkBalance()" [disabled]="!selectedUser">Get
+        Balance</button>
+      <br>
+      <span class="mt-3" *ngIf="showUserBalance">Balance of {{selectedUser.name}} : {{userBalance |
+        currency:'$'}}</span>
+    </div>
+    <div class="tab-pane fade" [ngClass]="{'active': this.selectedTab === tabType.deposit}" id="nav-deposit"
+      role="tabpanel" aria-labelledby="nav-deposit-tab">
+      <app-users-drop-down (selectedUser)="onChangeUser($event)" [showAmountText]="true" [reset]="resetDD"
+        (selectedAmount)="onChangeAmount($event)"></app-users-drop-down>
+      <button type="button" class="btn btn-success mt-3 mb-3" (click)="depositFund()"
+        [disabled]="!selectedUser || !selecteAmount">Deposit
+        fund</button>
+      <br>
+      <span class="mt-3" *ngIf="showDeposit">{{selecteAmount}} Deposited in {{selectedUser.name}}.New balance is:
+        {{userBalance | currency:'$'}}</span>
+
+    </div>
+    <div class="tab-pane fade" [ngClass]="{'active': this.selectedTab === tabType.withdraw}" id="nav-withdraw"
+      role="tabpanel" aria-labelledby="nav-withdraw-tab">
+      <app-users-drop-down (selectedUser)="onChangeUser($event)" [showAmountText]="true" [reset]="resetDD"
+        (selectedAmount)="onChangeAmount($event)"></app-users-drop-down>
+      <button type="button" class="btn btn-success mt-3 mb-3" (click)="withdrawFund()"
+        [disabled]="!selectedUser">Withdraw
+        fund</button>
+        <br>
+      <span class="mt-3" *ngIf="showWithDraw">{{selecteAmount}} Withdrawn from {{selectedUser.name}}.New balance is:
+        {{userBalance | currency:'$'}}</span>
+
+    </div>
+    <div class="tab-pane fade" [ngClass]="{'active': this.selectedTab === tabType.transfer}" id="nav-transfer"
+      role="tabpanel" aria-labelledby="nav-transfer-tab">
+      <label for="amount" class="form-label">From</label>
+      <br>
+      <span *ngIf="fromUserBalance">
+        Balance : {{fromUserBalance}}
+      </span>
+      <br>
+      <span *ngIf="!fromUserBalance && noBalanceError" class="text-danger"> From user does not have balance to transfer</span>
+      <app-users-drop-down (selectedUser)="onChangeFromUser($event)" [showAmountText]="false" [reset]="resetDD">
+      </app-users-drop-down>
+      <br>
+      <label for="amount" class="form-label">To</label>
+      <span *ngIf="toUserBalance">
+        Balance :{{toUserBalance}}
+      </span>
+      <app-users-drop-down (selectedUser)="onChangeToUser($event)" [showAmountText]="true" [reset]="resetDD"
+      (selectedAmount)="onChangeAmount($event)"></app-users-drop-down>
+      <br>
+      <br>
+      <button type="button" class="btn btn-success mt-3 mb-3" (click)="onTransfer()"
+        [disabled]="!fromUser || !toUser || !selecteAmount || fromUser?.id === toUser?.id || !fromUserBalance || selecteAmount > fromUserBalance">Transfer
+        fund</button>
+      <br>
+      <span *ngIf="fromUser?.id === toUser?.id && showSameUserTrasnError" class="text-danger">You can not transfer
+        amount to same user.</span>
+        <span *ngIf="selecteAmount > fromUserBalance" class="text-danger">You don't have enough balance</span>
+      <span class="mt-3" *ngIf="showTransfer">{{selecteAmount}} has been transffered from {{fromUser.name}} to
+        {{toUser.name}}.
+        New balance of {{toUser.name}}:
+        {{userBalance | currency:'$'}}</span>
+    </div>
+    <div class="tab-pane fade" [ngClass]="{'active': this.selectedTab === tabType.statement}" id="nav-statement"
+      role="tabpanel" aria-labelledby="nav-statement-tab">
+      <app-users-drop-down (selectedUser)="onChangeUser($event)" [showAmountText]="false" [reset]="resetDD">
+      </app-users-drop-down>
+      <button type="button" class="btn btn-success mt-3 mb-3" (click)="checkStatement()" [disabled]="!selectedUser">Get
+        Statement</button>
+      <table class="table" *ngIf="showStatement">
+        <thead>
+          <tr>
+            <th scope="col">Amount</th>
+            <th scope="col">Credit/Debit</th>
+            <th scope="col">Date</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let trans of userStatement">
+            <td>{{trans.amount | currency:'$'}}</td>
+            <td>{{trans.transactionType === transactionType.credit ? 'Credit' : 'Debit'}}</td>
+            <td>{{trans.date | date}}</td>
+          </tr>
+          <tr>
+            <td colspan="3">Balance: {{userBalance}}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
