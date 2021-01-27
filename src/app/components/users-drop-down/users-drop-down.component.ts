@@ -29,6 +29,7 @@ export class UsersDropDownComponent implements OnInit, OnChanges {
       id: -1,
       name: 'Select User'
     };
+    this.amount = null;
   }
   getUsers(): void {
     this.users = users;

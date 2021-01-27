@@ -45,7 +45,8 @@
         [disabled]="!selectedUser">Withdraw
         fund</button>
         <br>
-      <span class="mt-3" *ngIf="showWithDraw">{{selecteAmount}} Withdrawn from {{selectedUser.name}}.New balance is:
+        <span *ngIf="selecteAmount > userBalance && showNoBalaceErr" class="text-danger">You don't have enough balance to withdraw</span>
+      <span class="mt-3" *ngIf="showWithDraw && !showNoBalaceErr">{{selecteAmount}} Withdrawn from {{selectedUser.name}}.New balance is:
         {{userBalance | currency:'$'}}</span>
 
     </div>

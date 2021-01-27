@@ -30,6 +30,7 @@ export class HomeComponent implements OnInit {
   fromUserBalance: number;
   toUserBalance: number;
   noBalanceError: boolean;
+  showNoBalaceErr: boolean;
   get tabType(): typeof TabType {
     return TabType;
   }
@@ -57,6 +58,8 @@ export class HomeComponent implements OnInit {
     this.toUserBalance = null;
     this.fromUserBalance = null;
     this.noBalanceError = false;
+    this.userBalance = null;
+    this.selecteAmount = null;
   }
   onChangeAmount(amount: number): void {
     this.selecteAmount = amount;
@@ -95,7 +98,13 @@ export class HomeComponent implements OnInit {
     }
   }
   withdrawFund(): void {
+    this.checkBalance();
+    this.showNoBalaceErr = false;
     if (this.selectedUser) {
+      if (this.selecteAmount > this.userBalance) {
+        this.showNoBalaceErr = true;
+        return
+      };
       this.transactionData.push({
         userId: this.selectedUser.id,
         transactionType: TransactionType.debit,
